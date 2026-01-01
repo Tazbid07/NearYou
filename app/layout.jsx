@@ -2,13 +2,13 @@ import "./globals.css";
 
 export const metadata = {
     title: "NearYou",
-    description: "A private chat app for people near you",
+    description: "Private chat app",
 };
 
 export default function RootLayout({ children }) {
     return (
         <html lang="en">
-            <body className="bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white min-h-screen">
+            <body className="bg-neutral-950 text-white">
                 {children}
             </body>
         </html>
