@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 export default function ChatPage() {
-    const { username } = useParams(); // the person you are chatting with
+    const { username } = useParams();
     const router = useRouter();
 
     const [currentUser, setCurrentUser] = useState(null);
@@ -82,12 +82,7 @@ export default function ChatPage() {
         <main className="flex flex-col min-h-screen">
             {/* Header */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center font-bold">
-                        {username.charAt(0)}
-                    </div>
-                    <h2 className="font-semibold text-lg">{username}</h2>
-                </div>
+                <h2 className="font-semibold text-lg">{username}</h2>
 
                 <button
                     onClick={handleLogout}
