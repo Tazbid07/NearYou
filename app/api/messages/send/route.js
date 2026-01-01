@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export async function POST(req) {
     try {
         const cookieStore = cookies();
-        const from = cookieStore.get("user")?.value;
+        const from = cookieStore.get("token")?.value;
 
         if (!from) {
             return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -20,10 +20,10 @@ export async function POST(req) {
         }
 
         const { rows } = await sql`
-      INSERT INTO messages (sender, receiver, text, type)
-      VALUES (${from}, ${to}, ${text}, ${type})
-      RETURNING id, sender, receiver, text, type, created_at
-    `;
+            INSERT INTO messages (sender, receiver, text, type)
+            VALUES (${from}, ${to}, ${text}, ${type || "text"})
+            RETURNING id, sender, receiver, text, type, created_at
+        `;
 
         return Response.json({
             id: rows[0].id,

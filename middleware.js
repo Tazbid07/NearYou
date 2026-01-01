@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-    // ✅ MUST MATCH COOKIE SET IN LOGIN API
     const token = req.cookies.get("token")?.value;
     const { pathname } = req.nextUrl;
 

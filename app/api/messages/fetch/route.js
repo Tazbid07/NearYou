@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export async function GET(req) {
     try {
         const cookieStore = cookies();
-        const user = cookieStore.get("user")?.value;
+        const user = cookieStore.get("token")?.value;
 
         if (!user) {
             return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -21,14 +21,14 @@ export async function GET(req) {
         }
 
         const { rows } = await sql`
-      SELECT id, sender, receiver, text, type, created_at
-      FROM messages
-      WHERE 
-        (sender = ${user} AND receiver = ${withUser})
-        OR
-        (sender = ${withUser} AND receiver = ${user})
-      ORDER BY created_at ASC
-    `;
+            SELECT id, sender, receiver, text, type, created_at
+            FROM messages
+            WHERE 
+              (sender = ${user} AND receiver = ${withUser})
+              OR
+              (sender = ${withUser} AND receiver = ${user})
+            ORDER BY created_at ASC
+        `;
 
         const formatted = rows.map((m) => ({
             id: m.id,

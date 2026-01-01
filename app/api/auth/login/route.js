@@ -8,7 +8,7 @@ export async function POST(req) {
 
         if (!username || !password) {
             return Response.json(
-                { message: "Username and password required" },
+                { error: "Username and password required" },
                 { status: 400 }
             );
         }
@@ -18,7 +18,7 @@ export async function POST(req) {
 
         if (rows.length === 0) {
             return Response.json(
-                { message: "Wrong username or password" },
+                { error: "Wrong username or password" },
                 { status: 401 }
             );
         }
@@ -28,22 +28,23 @@ export async function POST(req) {
 
         if (!isValid) {
             return Response.json(
-                { message: "Wrong username or password" },
+                { error: "Wrong username or password" },
                 { status: 401 }
             );
         }
 
-        cookies().set("user", user.username, {
+        // ✅ SET COOKIE WITH CORRECT NAME
+        cookies().set("token", user.username, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
             path: "/",
         });
 
         return Response.json({ success: true });
     } catch (err) {
         return Response.json(
-            { message: "Server error" },
+            { error: "Server error" },
             { status: 500 }
         );
     }
