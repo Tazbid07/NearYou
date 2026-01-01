@@ -14,14 +14,25 @@ export default function ChatPage() {
 
     const messagesEndRef = useRef(null);
 
-    // Auto scroll to bottom
+    // Scroll to bottom on new messages
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
-    // Load user + messages
+    // Fetch messages
+    async function fetchMessages() {
+        const res = await fetch(`/api/messages/fetch?with=${username}`);
+        if (res.ok) {
+            const data = await res.json();
+            setMessages(data);
+        }
+    }
+
+    // Load auth + start polling
     useEffect(() => {
-        async function loadChat() {
+        let intervalId;
+
+        async function init() {
             const authRes = await fetch("/api/auth/me");
             if (!authRes.ok) {
                 router.push("/login");
@@ -31,16 +42,18 @@ export default function ChatPage() {
             const authData = await authRes.json();
             setCurrentUser(authData.username);
 
-            const msgRes = await fetch(`/api/messages/fetch?with=${username}`);
-            if (msgRes.ok) {
-                const msgData = await msgRes.json();
-                setMessages(msgData);
-            }
-
+            await fetchMessages();
             setLoading(false);
+
+            // ✅ Poll every 2 seconds
+            intervalId = setInterval(fetchMessages, 2000);
         }
 
-        loadChat();
+        init();
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
     }, [router, username]);
 
     // Send message
@@ -59,9 +72,8 @@ export default function ChatPage() {
         });
 
         if (res.ok) {
-            const newMessage = await res.json();
-            setMessages((prev) => [...prev, newMessage]);
             setText("");
+            fetchMessages(); // instant update for sender
         }
     }
 
@@ -83,7 +95,6 @@ export default function ChatPage() {
             {/* Header */}
             <header className="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
                 <h2 className="font-semibold text-lg">{username}</h2>
-
                 <button
                     onClick={handleLogout}
                     className="text-sm px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 transition"
@@ -100,7 +111,8 @@ export default function ChatPage() {
                     return (
                         <div
                             key={msg.id}
-                            className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                            className={`flex ${isMine ? "justify-end" : "justify-start"
+                                }`}
                         >
                             <div
                                 className={`max-w-xs md:max-w-md px-4 py-2 rounded-2xl text-sm ${isMine
@@ -128,7 +140,6 @@ export default function ChatPage() {
                     placeholder="Type a message..."
                     className="flex-1 px-4 py-3 rounded-xl bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white"
                 />
-
                 <button
                     type="submit"
                     className="px-5 py-3 rounded-xl bg-white text-black font-semibold hover:bg-neutral-200 transition"
