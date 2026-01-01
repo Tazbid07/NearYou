@@ -26,14 +26,16 @@ export default function LoginPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.message || "Invalid username or password");
+                setError(data.error || "Invalid username or password");
                 setLoading(false);
                 return;
             }
 
+            // ✅ LOGIN SUCCESS → REDIRECT
             router.push("/inbox");
         } catch (err) {
             setError("Something went wrong. Please try again.");
+        } finally {
             setLoading(false);
         }
     }
@@ -55,7 +57,6 @@ export default function LoginPage() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white"
-                            placeholder="Enter username"
                         />
                     </div>
 
@@ -67,12 +68,13 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl bg-neutral-800 border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-white"
-                            placeholder="Enter password"
                         />
                     </div>
 
                     {error && (
-                        <p className="text-red-400 text-sm text-center">{error}</p>
+                        <p className="text-red-400 text-sm text-center">
+                            {error}
+                        </p>
                     )}
 
                     <button

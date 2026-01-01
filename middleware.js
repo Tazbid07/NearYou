@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-    const user = req.cookies.get("user")?.value;
+    // ✅ MUST MATCH COOKIE SET IN LOGIN API
+    const token = req.cookies.get("token")?.value;
     const { pathname } = req.nextUrl;
 
     const protectedRoutes = ["/inbox", "/chat"];
@@ -10,7 +11,7 @@ export function middleware(req) {
         pathname.startsWith(route)
     );
 
-    if (isProtected && !user) {
+    if (isProtected && !token) {
         return NextResponse.redirect(new URL("/login", req.url));
     }
 
